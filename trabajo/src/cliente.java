@@ -30,14 +30,14 @@ public class cliente {
     }
 
     public void setTelefono(int telefono) {
-        if (telefono.isEmpty()) {
+        /*if (telefono) {
             System.out.println("No esta permitido los vacios.");
         }
         if (telefono.isBlank()) {
             System.out.println("Llene la respuesta con caracteres reales.");
-        } else {
+        } else {*/
             this.telefono = telefono;
-        }
+       // }
     }
 
     public String getZona() {

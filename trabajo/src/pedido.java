@@ -1,8 +1,8 @@
 import java.time.LocalDateTime;
-import java.time.Instant;
+import java.util.UUID;
 
-public class pedido {
-    private final int id;
+public class pedido implements rastreable, facturable{
+    private UUID id;
     private String cliente;
     private String destino;
     private float pesokg;
@@ -10,10 +10,13 @@ public class pedido {
     private LocalDateTime fechaHora;
     private String estado;
 
+    public pedido() {
+    }
+
     private void calcularCosto(){
     }
 
-    public int getId() {
+    public UUID getId() {
         return id;
     }
 
@@ -66,7 +69,7 @@ public class pedido {
     }
 
     public pedido(int id, String cliente, String destino, float pesokg, float distanciaKm, LocalDateTime fechaHora, String estado) {
-        this.id = id;
+        this.id = UUID.randomUUID();
         this.cliente = cliente;
         this.destino = destino;
         this.pesokg = pesokg;
@@ -78,4 +81,13 @@ public class pedido {
     private void cambiarEstado(){
     }
 
+    @Override
+    public void calcularImporte() {
+
+    }
+
+    @Override
+    public void obtenerEstadoActual() {
+
+    }
 }
