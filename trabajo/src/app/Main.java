@@ -1,5 +1,9 @@
+package app;
+
 import java.util.Scanner;
-void main() {
+
+public class Main {
+public static void main(String[] args) {
     System.out.println("_________________________________________________________");
     System.out.println("|       Sistemas de gestion         |      Citylink      |");
     System.out.println("|___________________________________|____________________|");
@@ -15,8 +19,20 @@ void main() {
     System.out.println("11)Salir");
     System.out.print("\nIngresa un número entero: ");
     Scanner scanner = new Scanner(System.in);
-    int opc = scanner.nextInt();
-    scanner.close();
+    int opc;
+    try {
+        while (!scanner.hasNextInt()) {
+            if (!scanner.hasNext()) {
+                return;
+            }
+            scanner.next();
+            System.out.println("Entrada inválida. Debe ingresar un número.");
+            System.out.print("Ingresa un número entero: ");
+        }
+        opc = scanner.nextInt();
+    } finally {
+        scanner.close();
+    }
     switch (opc) {
         case 1:
             System.out.printf("1");
@@ -59,5 +75,5 @@ void main() {
     //pedidoUrgente botiquin = new pedidoUrgente()
     repartidor repartidor1 = new repartidor(21727367, Jorge,bici1, asignacion1);
     System.out.println(repartidor.getNombre);*/
-    return;
+}
 }
