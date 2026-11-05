@@ -7,6 +7,7 @@ import excepciones.EstadoInvalidoException;
 public abstract class pedido implements rastreable, facturable {
     private int id; // codigo entero único (el enunciado no pide UUID)
     private vehiculo vehiculoAsignado; // para calcular costo y tiempo con su costo por km
+    private repartidor repartidorAsignado;
     private cliente cliente;
     private String destino;
     private float pesokg;
@@ -109,6 +110,18 @@ public abstract class pedido implements rastreable, facturable {
             throw new IllegalArgumentException("El vehículo es obligatorio.");
         }
         this.vehiculoAsignado = v;
+    }
+
+    public repartidor getRepartidorAsignado() {
+        return repartidorAsignado;
+    }
+
+    void asignarRepartidor(repartidor nuevo) {
+        if (nuevo == null) {
+            throw new IllegalArgumentException("El repartidor es obligatorio.");
+        }
+        this.repartidorAsignado = nuevo;
+        this.vehiculoAsignado = nuevo.getVehiculo();
     }
 
     // REGLA: PENDIENTE -> EN_CAMINO -> ENTREGADO, y CANCELADO solo desde PENDIENTE

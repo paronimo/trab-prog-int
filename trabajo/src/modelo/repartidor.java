@@ -12,11 +12,20 @@ public class repartidor implements rastreable, facturable {
 
     // REGLA: solo se asigna si el vehículo puede transportarlo
     public void asignarPedido(pedido p) throws CapacidadExcedidaException, AlmacenamientoLlenoException {
+        if (p == null) {
+            throw new IllegalArgumentException("El pedido es obligatorio.");
+        }
+        if (p.getRepartidorAsignado() != null) {
+            throw new IllegalArgumentException("El pedido ya tiene un repartidor asignado.");
+        }
+        if (!"PENDIENTE".equals(p.getEstado())) {
+            throw new IllegalArgumentException("Solo se pueden asignar pedidos pendientes.");
+        }
         if (cantidadPedidos == pedidosAsignados.length) {
             throw new AlmacenamientoLlenoException("El repartidor alcanzó el máximo de pedidos asignados.");
         }
         this.vehiculo.puedeTransportar(p);
-        p.asignarVehiculo(this.vehiculo);
+        p.asignarRepartidor(this);
         pedidosAsignados[cantidadPedidos++] = p;
     }
 
@@ -63,7 +72,9 @@ public class repartidor implements rastreable, facturable {
     }
 
     public pedido[] getPedidosAsignados() {
-        return pedidosAsignados;
+        pedido[] resultado = new pedido[cantidadPedidos];
+        System.arraycopy(pedidosAsignados, 0, resultado, 0, cantidadPedidos);
+        return resultado;
     }
 
     public repartidor(int legajo, String nombre, vehiculo vehiculo, pedido[] pedidosAsignados) {
@@ -73,7 +84,17 @@ public class repartidor implements rastreable, facturable {
         this.legajo = legajo;
         this.nombre = nombre;
         this.vehiculo = vehiculo;
-        this.pedidosAsignados = pedidosAsignados == null ? new pedido[100] : pedidosAsignados;
+        this.pedidosAsignados = new pedido[pedidosAsignados == null ? 100 : pedidosAsignados.length];
+        if (pedidosAsignados != null) {
+            for (pedido asignado : pedidosAsignados) {
+                if (asignado != null) {
+                    if (cantidadPedidos == this.pedidosAsignados.length) {
+                        throw new IllegalArgumentException("El arreglo de pedidos asignados no es válido.");
+                    }
+                    this.pedidosAsignados[cantidadPedidos++] = asignado;
+                }
+            }
+        }
     }
 
     // REGLA: comisión = 10% del importe de los pedidos entregados
@@ -91,5 +112,9 @@ public class repartidor implements rastreable, facturable {
     @Override
     public String obtenerEstadoActual() {
         return "Repartidor " + nombre + " - pedidos asignados: " + cantidadPedidos;
+    }
+
+    public int getCantidadPedidos() {
+        return cantidadPedidos;
     }
 }

@@ -64,4 +64,9 @@ public class cliente {
         this.telefono = telefono;
         this.nombre = nombre;
     }
+
+    @Override
+    public String toString() {
+        return "Cliente " + id + ": " + nombre + " - teléfono: " + telefono + " - zona: " + zona;
+    }
 }
