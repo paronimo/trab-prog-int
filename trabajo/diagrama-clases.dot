@@ -1,0 +1,183 @@
+digraph CityLinkUML {
+    graph [
+        label="CityLink - Diagrama de clases",
+        labelloc=t,
+        fontsize=20,
+        fontname="Arial",
+        rankdir=TB,
+        splines=polyline,
+        nodesep=0.35,
+        ranksep=0.55,
+        pad=0.25,
+        bgcolor="white"
+    ];
+    node [shape=plain, fontname="Arial", fontsize=10];
+    edge [fontname="Arial", fontsize=9, color="#475569", arrowsize=0.8];
+
+    CityLink [label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#334155">
+            <TR><TD BGCOLOR="#dbeafe"><B>CityLink</B></TD></TR>
+            <TR><TD ALIGN="LEFT">- clientes: cliente[50]<BR ALIGN="LEFT"/>- pedidos: pedido[100]<BR ALIGN="LEFT"/>- repartidores: repartidor[10]</TD></TR>
+            <TR><TD ALIGN="LEFT">+ registrarCliente(cliente)<BR ALIGN="LEFT"/>+ registrarPedido(pedido)<BR ALIGN="LEFT"/>+ registrarRepartidor(repartidor)<BR ALIGN="LEFT"/>+ buscarCliente(codigo / nombre)<BR ALIGN="LEFT"/>+ asignarPedido(codigo, legajo)<BR ALIGN="LEFT"/>+ cambiarEstadoPedido(codigo, estado)<BR ALIGN="LEFT"/>+ cargarDatosPrueba()</TD></TR>
+        </TABLE>
+    >];
+
+    Main [label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#334155">
+            <TR><TD BGCOLOR="#e2e8f0"><B>app.Main</B></TD></TR>
+            <TR><TD ALIGN="LEFT">+ main(args)</TD></TR>
+        </TABLE>
+    >];
+
+    Cliente [label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#334155">
+            <TR><TD BGCOLOR="#dcfce7"><B>cliente</B></TD></TR>
+            <TR><TD ALIGN="LEFT">- id: int<BR ALIGN="LEFT"/>- nombre: String<BR ALIGN="LEFT"/>- telefono: int<BR ALIGN="LEFT"/>- zona: String</TD></TR>
+            <TR><TD ALIGN="LEFT">+ getters / setters<BR ALIGN="LEFT"/>+ toString()</TD></TR>
+        </TABLE>
+    >];
+
+    Pedido [label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#334155">
+            <TR><TD BGCOLOR="#fef3c7"><B><I>&lt;&lt;abstract&gt;&gt;</I><BR/>pedido</B></TD></TR>
+            <TR><TD ALIGN="LEFT">- id: int<BR ALIGN="LEFT"/>- destino: String<BR ALIGN="LEFT"/>- pesokg: float<BR ALIGN="LEFT"/>- distanciaKm: float<BR ALIGN="LEFT"/>- fechaHora: LocalDateTime<BR ALIGN="LEFT"/>- estado: String</TD></TR>
+            <TR><TD ALIGN="LEFT"># calcularCosto(): double<BR ALIGN="LEFT"/>+ calcularImporte(): double<BR ALIGN="LEFT"/>+ cambiarEstado(estado)<BR ALIGN="LEFT"/>+ obtenerEstadoActual(): String</TD></TR>
+        </TABLE>
+    >];
+
+    PedidoNormal [label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#334155">
+            <TR><TD BGCOLOR="#fefce8"><B>pedidoNormal</B></TD></TR>
+            <TR><TD ALIGN="LEFT">+ calcularCosto(): double</TD></TR>
+        </TABLE>
+    >];
+
+    PedidoUrgente [label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#334155">
+            <TR><TD BGCOLOR="#fefce8"><B>pedidoUrgente</B></TD></TR>
+            <TR><TD ALIGN="LEFT">+ calcularCosto(): double</TD></TR>
+        </TABLE>
+    >];
+
+    PedidoFragil [label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#334155">
+            <TR><TD BGCOLOR="#fefce8"><B>pedidoFragil</B></TD></TR>
+            <TR><TD ALIGN="LEFT">+ calcularCosto(): double<BR ALIGN="LEFT"/>+ esFragil(): boolean</TD></TR>
+        </TABLE>
+    >];
+
+    Vehiculo [label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#334155">
+            <TR><TD BGCOLOR="#fce7f3"><B><I>&lt;&lt;abstract&gt;&gt;</I><BR/>vehiculo</B></TD></TR>
+            <TR><TD ALIGN="LEFT">- patente: int<BR ALIGN="LEFT"/>- capacidad: int<BR ALIGN="LEFT"/>- velocidadKmH: float<BR ALIGN="LEFT"/>- costoPorKm: int</TD></TR>
+            <TR><TD ALIGN="LEFT">+ calcularTiempoEntrega(km): double<BR ALIGN="LEFT"/>+ puedeTransportar(pedido): boolean</TD></TR>
+        </TABLE>
+    >];
+
+    Bicicleta [label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#334155">
+            <TR><TD BGCOLOR="#fdf2f8"><B>bicicleta</B></TD></TR>
+            <TR><TD ALIGN="LEFT">+ calcularTiempoEntrega(km)<BR ALIGN="LEFT"/>+ puedeTransportar(pedido)</TD></TR>
+        </TABLE>
+    >];
+
+    Motocicleta [label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#334155">
+            <TR><TD BGCOLOR="#fdf2f8"><B>motocicleta</B></TD></TR>
+            <TR><TD ALIGN="LEFT">+ calcularTiempoEntrega(km)<BR ALIGN="LEFT"/>+ getTiempoExtra()</TD></TR>
+        </TABLE>
+    >];
+
+    Camioneta [label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#334155">
+            <TR><TD BGCOLOR="#fdf2f8"><B>camioneta</B></TD></TR>
+            <TR><TD ALIGN="LEFT">+ calcularTiempoEntrega(km)<BR ALIGN="LEFT"/>+ getTiempoExtra()</TD></TR>
+        </TABLE>
+    >];
+
+    Repartidor [label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#334155">
+            <TR><TD BGCOLOR="#dbeafe"><B>repartidor</B></TD></TR>
+            <TR><TD ALIGN="LEFT">- legajo: int<BR ALIGN="LEFT"/>- nombre: String<BR ALIGN="LEFT"/>- pedidosAsignados: pedido[]</TD></TR>
+            <TR><TD ALIGN="LEFT">+ asignarPedido(pedido)<BR ALIGN="LEFT"/>+ registrarEntrega(pedido)<BR ALIGN="LEFT"/>+ calcularImporte(): double<BR ALIGN="LEFT"/>+ obtenerEstadoActual(): String</TD></TR>
+        </TABLE>
+    >];
+
+    Rastreable [label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#334155">
+            <TR><TD BGCOLOR="#e0e7ff"><B>&lt;&lt;interface&gt;&gt;<BR/>rastreable</B></TD></TR>
+            <TR><TD ALIGN="LEFT">+ obtenerEstadoActual(): String</TD></TR>
+        </TABLE>
+    >];
+
+    Facturable [label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#334155">
+            <TR><TD BGCOLOR="#e0e7ff"><B>&lt;&lt;interface&gt;&gt;<BR/>facturable</B></TD></TR>
+            <TR><TD ALIGN="LEFT">+ calcularImporte(): double</TD></TR>
+        </TABLE>
+    >];
+
+    Excepcion [label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#334155">
+            <TR><TD BGCOLOR="#fee2e2"><B>Exception</B></TD></TR>
+        </TABLE>
+    >];
+    RuntimeExcepcion [label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#334155">
+            <TR><TD BGCOLOR="#fee2e2"><B>RuntimeException</B></TD></TR>
+        </TABLE>
+    >];
+    ClienteNoEncontrado [label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#334155">
+            <TR><TD BGCOLOR="#fff1f2"><B>ClienteNoEncontradoException</B></TD></TR>
+        </TABLE>
+    >];
+    PedidoInvalido [label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#334155">
+            <TR><TD BGCOLOR="#fff1f2"><B>PedidoInvalidoException</B></TD></TR>
+        </TABLE>
+    >];
+    CapacidadExcedida [label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#334155">
+            <TR><TD BGCOLOR="#fff1f2"><B>CapacidadExcedidaException</B></TD></TR>
+        </TABLE>
+    >];
+    AlmacenamientoLleno [label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#334155">
+            <TR><TD BGCOLOR="#fff1f2"><B>AlmacenamientoLlenoException</B></TD></TR>
+        </TABLE>
+    >];
+    EstadoInvalido [label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#334155">
+            <TR><TD BGCOLOR="#fff1f2"><B>EstadoInvalidoException</B></TD></TR>
+        </TABLE>
+    >];
+
+    Main -> CityLink [style=dashed, label="usa"];
+    CityLink -> Cliente [dir=both, arrowtail=diamond, arrowhead=none, label="1   0..50"];
+    CityLink -> Pedido [dir=both, arrowtail=diamond, arrowhead=none, label="1   0..100"];
+    CityLink -> Repartidor [dir=both, arrowtail=diamond, arrowhead=none, label="1   0..10"];
+
+    PedidoNormal -> Pedido [arrowhead=empty];
+    PedidoUrgente -> Pedido [arrowhead=empty];
+    PedidoFragil -> Pedido [arrowhead=empty];
+    Bicicleta -> Vehiculo [arrowhead=empty];
+    Motocicleta -> Vehiculo [arrowhead=empty];
+    Camioneta -> Vehiculo [arrowhead=empty];
+
+    Pedido -> Cliente [dir=both, arrowtail=odiamond, arrowhead=none, label="0..*   1"];
+    Repartidor -> Vehiculo [dir=both, arrowtail=diamond, arrowhead=none, label="1   1"];
+    Repartidor -> Pedido [dir=both, arrowtail=odiamond, arrowhead=none, label="1   0..*"];
+
+    Pedido -> Rastreable [style=dashed, arrowhead=empty, label="implementa"];
+    Pedido -> Facturable [style=dashed, arrowhead=empty, label="implementa"];
+    Repartidor -> Rastreable [style=dashed, arrowhead=empty, label="implementa"];
+    Repartidor -> Facturable [style=dashed, arrowhead=empty, label="implementa"];
+
+    ClienteNoEncontrado -> Excepcion [arrowhead=empty];
+    PedidoInvalido -> Excepcion [arrowhead=empty];
+    CapacidadExcedida -> Excepcion [arrowhead=empty];
+    AlmacenamientoLleno -> Excepcion [arrowhead=empty];
+    EstadoInvalido -> RuntimeExcepcion [arrowhead=empty];
+
+}

@@ -1,0 +1,171 @@
+@startuml
+title CityLink - Diagrama de clases
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+package app {
+    class Main {
+        +main(args: String[]): void
+    }
+}
+
+package modelo {
+    class CityLink {
+        -clientes: cliente[50]
+        -pedidos: pedido[100]
+        -repartidores: repartidor[10]
+        -cantidadClientes: int
+        -cantidadPedidos: int
+        -cantidadRepartidores: int
+        +cargarDatosPrueba(): void
+        +registrarCliente(nuevo: cliente): void
+        +registrarPedido(nuevo: pedido): void
+        +registrarRepartidor(nuevo: repartidor): void
+        +buscarCliente(codigo: int): cliente
+        +buscarCliente(nombre: String): cliente
+        +asignarPedido(codigoPedido: int, legajo: int): void
+        +buscarPedido(codigo: int): pedido
+        +buscarRepartidor(legajo: int): repartidor
+        +cambiarEstadoPedido(codigoPedido: int, nuevoEstado: String): void
+        +calcularImporteTotal(): double
+    }
+
+    class cliente {
+        -id: int
+        -nombre: String
+        -telefono: int
+        -zona: String
+        +cliente()
+        +cliente(zona: String, telefono: int, nombre: String, id: int)
+        +getId(): int
+        +getNombre(): String
+        +getTelefono(): int
+        +getZona(): String
+        +toString(): String
+    }
+
+    abstract class pedido {
+        -id: int
+        -destino: String
+        -pesokg: float
+        -distanciaKm: float
+        -fechaHora: LocalDateTime
+        -estado: String
+        +pedido(id: int, cliente: cliente, destino: String, pesokg: float, distanciaKm: float, fechaHora: LocalDateTime)
+        #calcularCosto(): double
+        #calcularCostoBase(): double
+        +calcularImporte(): double
+        +cambiarEstado(nuevoEstado: String): void
+        +obtenerEstadoActual(): String
+    }
+
+    class pedidoNormal {
+        +calcularCosto(): double
+    }
+
+    class pedidoUrgente {
+        +calcularCosto(): double
+    }
+
+    class pedidoFragil {
+        +calcularCosto(): double
+        +esFragil(): boolean
+    }
+
+    abstract class vehiculo {
+        -patente: int
+        -capacidad: int
+        -velocidadKmH: float
+        -costoPorKm: int
+        +calcularTiempoEntrega(distanciaKm: double): double
+        #calcularTiempoConExtra(distanciaKm: double, tiempoExtra: double): double
+        +puedeTransportar(p: pedido): boolean
+        +getTiempoExtra(): double
+    }
+
+    class bicicleta {
+        +calcularTiempoEntrega(distanciaKm: double): double
+        +puedeTransportar(p: pedido): boolean
+    }
+
+    class motocicleta {
+        +calcularTiempoEntrega(distanciaKm: double): double
+        +getTiempoExtra(): double
+    }
+
+    class camioneta {
+        +calcularTiempoEntrega(distanciaKm: double): double
+        +getTiempoExtra(): double
+    }
+
+    class repartidor {
+        -legajo: int
+        -nombre: String
+        -pedidosAsignados: pedido[]
+        -cantidadPedidos: int
+        +asignarPedido(p: pedido): void
+        +registrarEntrega(pedido: pedido): void
+        +calcularImporte(): double
+        +obtenerEstadoActual(): String
+        +getCantidadPedidos(): int
+    }
+
+    interface rastreable {
+        +obtenerEstadoActual(): String
+    }
+
+    interface facturable {
+        +calcularImporte(): double
+    }
+}
+
+package excepciones {
+    class ClienteNoEncontradoException
+    class PedidoInvalidoException
+    class CapacidadExcedidaException
+    class AlmacenamientoLlenoException
+    class EstadoInvalidoException
+}
+
+class Exception <<Java>>
+class RuntimeException <<Java>>
+
+Main ..> CityLink : usa
+
+CityLink "1" o-- "0..50" cliente : clientes
+CityLink "1" o-- "0..100" pedido : pedidos
+CityLink "1" o-- "0..10" repartidor : repartidores
+
+pedidoNormal --|> pedido
+pedidoUrgente --|> pedido
+pedidoFragil --|> pedido
+
+bicicleta --|> vehiculo
+motocicleta --|> vehiculo
+camioneta --|> vehiculo
+
+pedido "0..*" --> "1" cliente : cliente
+pedido "0..*" --> "0..1" vehiculo : vehiculoAsignado
+pedido "0..*" --> "0..1" repartidor : repartidorAsignado
+repartidor "1" o-- "0..*" pedido : pedidosAsignados
+repartidor "0..*" --> "1" vehiculo : vehiculo
+
+pedido ..|> rastreable
+pedido ..|> facturable
+repartidor ..|> rastreable
+repartidor ..|> facturable
+
+ClienteNoEncontradoException --|> Exception
+PedidoInvalidoException --|> Exception
+CapacidadExcedidaException --|> Exception
+AlmacenamientoLlenoException --|> Exception
+EstadoInvalidoException --|> RuntimeException
+
+CityLink ..> ClienteNoEncontradoException : lanza
+CityLink ..> PedidoInvalidoException : lanza
+CityLink ..> AlmacenamientoLlenoException : lanza
+repartidor ..> CapacidadExcedidaException : lanza
+repartidor ..> AlmacenamientoLlenoException : lanza
+pedido ..> EstadoInvalidoException : lanza
+vehiculo ..> CapacidadExcedidaException : lanza
+@enduml
