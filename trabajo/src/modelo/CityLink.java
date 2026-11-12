@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 package modelo;
 
 import excepciones.AlmacenamientoLlenoException;
@@ -10,9 +11,9 @@ public class CityLink {
     private static final int CAPACIDAD_PEDIDOS = 100;
     private static final int CAPACIDAD_REPARTIDORES = 10;
 
-    private final cliente[] clientes = new cliente[CAPACIDAD_CLIENTES];
-    private final pedido[] pedidos = new pedido[CAPACIDAD_PEDIDOS];
-    private final repartidor[] repartidores = new repartidor[CAPACIDAD_REPARTIDORES];
+    private final ArrayList<cliente> clientes = new ArrayList<>();
+    private final ArrayList<pedido> pedidos = new ArrayList<>();
+    private final ArrayList<repartidor> repartidores = new ArrayList<>();
     private int cantidadClientes;
     private int cantidadPedidos;
     private int cantidadRepartidores;
