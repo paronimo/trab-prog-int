@@ -1,5 +1,6 @@
-import java.util.ArrayList;
 package modelo;
+
+import java.util.ArrayList;
 
 import excepciones.AlmacenamientoLlenoException;
 import excepciones.ClienteNoEncontradoException;
@@ -73,7 +74,7 @@ public class CityLink {
     }
 
     public void registrarCliente(cliente nuevo) throws AlmacenamientoLlenoException {
-        if (cantidadClientes == clientes.length) {
+        if (cantidadClientes == clientes.size()) {
             throw new AlmacenamientoLlenoException("No hay espacio para más clientes.");
         }
         if (nuevo == null) {
@@ -82,17 +83,18 @@ public class CityLink {
         if (nuevo.getId() <= 0) {
             throw new IllegalArgumentException("El código del cliente debe ser positivo.");
         }
-        for (int i = 0; i < cantidadClientes; i++) {
-            if (clientes[i].getId() == nuevo.getId()) {
+        for (cliente c : clientes) {
+            if (c.getId() == nuevo.getId()) {
                 throw new IllegalArgumentException("Ya existe un cliente con ese código.");
             }
         }
-        clientes[cantidadClientes++] = nuevo;
+        clientes.add(nuevo);
+        cantidadClientes++;
     }
 
     public void registrarPedido(pedido nuevo)
             throws AlmacenamientoLlenoException, ClienteNoEncontradoException, PedidoInvalidoException {
-        if (cantidadPedidos == pedidos.length) {
+        if (cantidadPedidos == pedidos.size()) {
             throw new AlmacenamientoLlenoException("No hay espacio para más pedidos.");
         }
         if (nuevo == null) {
@@ -102,28 +104,30 @@ public class CityLink {
             throw new PedidoInvalidoException("El pedido debe tener un cliente.");
         }
         nuevo.setCliente(buscarCliente(nuevo.getCliente().getId()));
-        for (int i = 0; i < cantidadPedidos; i++) {
-            if (pedidos[i].getId() == nuevo.getId()) {
+        for (pedido p : pedidos) {
+            if (p.getId() == nuevo.getId()) {
                 throw new PedidoInvalidoException("Ya existe un pedido con ese código.");
             }
         }
-        pedidos[cantidadPedidos++] = nuevo;
+        pedidos.add(nuevo);
+        cantidadPedidos++;
     }
 
     public void registrarRepartidor(repartidor nuevo) throws AlmacenamientoLlenoException {
-        if (cantidadRepartidores == repartidores.length) {
+        if (cantidadRepartidores == repartidores.size()) {
             throw new AlmacenamientoLlenoException("No hay espacio para más repartidores.");
         }
         if (nuevo == null) {
             throw new IllegalArgumentException("El repartidor es obligatorio.");
         }
-        repartidores[cantidadRepartidores++] = nuevo;
+        repartidores.add(nuevo);
+        cantidadRepartidores++;
     }
 
     public cliente buscarCliente(int codigo) throws ClienteNoEncontradoException {
-        for (int i = 0; i < cantidadClientes; i++) {
-            if (clientes[i].getId() == codigo) {
-                return clientes[i];
+        for (cliente c : clientes) {
+            if (c.getId() == codigo) {
+                return c;
             }
         }
         throw new ClienteNoEncontradoException("No existe un cliente con el código " + codigo + ".");
@@ -131,9 +135,9 @@ public class CityLink {
 
     public cliente buscarCliente(String nombre) throws ClienteNoEncontradoException {
         if (nombre != null) {
-            for (int i = 0; i < cantidadClientes; i++) {
-                if (clientes[i].getNombre().equalsIgnoreCase(nombre.trim())) {
-                    return clientes[i];
+            for (cliente c : clientes) {
+                if (c.getNombre().equalsIgnoreCase(nombre.trim())) {
+                    return c;
                 }
             }
         }
@@ -146,18 +150,18 @@ public class CityLink {
     }
 
     public pedido buscarPedido(int codigo) {
-        for (int i = 0; i < cantidadPedidos; i++) {
-            if (pedidos[i].getId() == codigo) {
-                return pedidos[i];
+        for (pedido p : pedidos) {
+            if (p.getId() == codigo) {
+                return p;
             }
         }
         throw new IllegalArgumentException("No existe un pedido con el código " + codigo + ".");
     }
 
     public repartidor buscarRepartidor(int legajo) {
-        for (int i = 0; i < cantidadRepartidores; i++) {
-            if (repartidores[i].getLegajo() == legajo) {
-                return repartidores[i];
+        for (repartidor r : repartidores) {
+            if (r.getLegajo() == legajo) {
+                return r;
             }
         }
         throw new IllegalArgumentException("No existe un repartidor con ese legajo.");
@@ -189,9 +193,9 @@ public class CityLink {
 
     public double calcularImporteTotal() {
         double total = 0;
-        for (int i = 0; i < cantidadPedidos; i++) {
-            if (pedidos[i].getRepartidorAsignado() != null) {
-                total += pedidos[i].calcularImporte();
+        for (pedido p : pedidos) {
+            if (p.getRepartidorAsignado() != null) {
+                total += p.calcularImporte();
             }
         }
         return total;
