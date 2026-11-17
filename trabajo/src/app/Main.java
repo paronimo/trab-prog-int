@@ -1,6 +1,5 @@
 package app;
 
-import excepciones.AlmacenamientoLlenoException;
 import excepciones.CapacidadExcedidaException;
 import excepciones.ClienteNoEncontradoException;
 import excepciones.EstadoInvalidoException;
@@ -26,7 +25,7 @@ public class Main {
 
         try {
             cityLink.cargarDatosPrueba();
-        } catch (AlmacenamientoLlenoException | ClienteNoEncontradoException
+        } catch (ClienteNoEncontradoException
                  | PedidoInvalidoException | CapacidadExcedidaException e) {
             System.out.println("No se pudieron cargar los datos de prueba: " + e.getMessage());
             scanner.close();
@@ -51,7 +50,7 @@ public class Main {
                     case 10 -> continuar = false;
                     default -> System.out.println("Opción fuera de rango.");
                 }
-            } catch (AlmacenamientoLlenoException | ClienteNoEncontradoException
+            } catch (ClienteNoEncontradoException
                      | PedidoInvalidoException | CapacidadExcedidaException
                      | IllegalArgumentException | EstadoInvalidoException e) {
                 System.out.println("Error: " + e.getMessage());
@@ -75,8 +74,7 @@ public class Main {
         System.out.println("10. Salir");
     }
 
-    private static void registrarCliente(Scanner scanner, CityLink cityLink)
-            throws AlmacenamientoLlenoException {
+    private static void registrarCliente(Scanner scanner, CityLink cityLink) {
         int codigo = leerEntero(scanner, "Código: ");
         String nombre = leerTexto(scanner, "Nombre: ");
         int telefono = leerEntero(scanner, "Teléfono: ");
@@ -85,8 +83,7 @@ public class Main {
         System.out.println("Cliente registrado.");
     }
 
-    private static void registrarRepartidor(Scanner scanner, CityLink cityLink)
-            throws AlmacenamientoLlenoException {
+    private static void registrarRepartidor(Scanner scanner, CityLink cityLink) {
         int legajo = leerEntero(scanner, "Legajo: ");
         String nombre = leerTexto(scanner, "Nombre: ");
         int patente = leerEntero(scanner, "Patente (número): ");
@@ -103,7 +100,7 @@ public class Main {
     }
 
     private static void registrarPedido(Scanner scanner, CityLink cityLink)
-            throws AlmacenamientoLlenoException, ClienteNoEncontradoException, PedidoInvalidoException {
+            throws ClienteNoEncontradoException, PedidoInvalidoException {
         int codigo = leerEntero(scanner, "Código del pedido: ");
         int codigoCliente = leerEntero(scanner, "Código del cliente: ");
         cliente clientePedido = cityLink.buscarCliente(codigoCliente);
@@ -125,7 +122,7 @@ public class Main {
     }
 
     private static void asignarPedido(Scanner scanner, CityLink cityLink)
-            throws AlmacenamientoLlenoException, CapacidadExcedidaException {
+            throws CapacidadExcedidaException {
         int codigoPedido = leerEntero(scanner, "Código del pedido: ");
         int legajo = leerEntero(scanner, "Legajo del repartidor: ");
         cityLink.asignarPedido(codigoPedido, legajo);
@@ -157,8 +154,8 @@ public class Main {
     }
 
     private static void listarPedidos(CityLink cityLink) {
-        pedido[] pedidos = cityLink.getPedidos();
-        if (pedidos.length == 0) {
+        var pedidos = cityLink.getPedidos();
+        if (pedidos.isEmpty()) {
             System.out.println("No hay pedidos registrados.");
             return;
         }

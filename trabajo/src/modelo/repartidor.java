@@ -1,17 +1,18 @@
 package modelo;
 
-import excepciones.AlmacenamientoLlenoException;
 import excepciones.CapacidadExcedidaException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class repartidor implements rastreable, facturable {
     private final int legajo;
     private String nombre;
     private vehiculo vehiculo; // antes era String: necesita el objeto para capacidad/costo
-    private pedido[] pedidosAsignados;
-    private int cantidadPedidos;
+    private final List<pedido> pedidosAsignados = new ArrayList<>();
+    private final List<pedido> historialEntregas = new ArrayList<>();
 
     // REGLA: solo se asigna si el vehículo puede transportarlo
-    public void asignarPedido(pedido p) throws CapacidadExcedidaException, AlmacenamientoLlenoException {
+    public void asignarPedido(pedido p) throws CapacidadExcedidaException {
         if (p == null) {
             throw new IllegalArgumentException("El pedido es obligatorio.");
         }
@@ -21,12 +22,9 @@ public class repartidor implements rastreable, facturable {
         if (!"PENDIENTE".equals(p.getEstado())) {
             throw new IllegalArgumentException("Solo se pueden asignar pedidos pendientes.");
         }
-        if (cantidadPedidos == pedidosAsignados.length) {
-            throw new AlmacenamientoLlenoException("El repartidor alcanzó el máximo de pedidos asignados.");
-        }
         this.vehiculo.puedeTransportar(p);
         p.asignarRepartidor(this);
-        pedidosAsignados[cantidadPedidos++] = p;
+        pedidosAsignados.add(p);
     }
 
     public void registrarEntrega(pedido pedido) {
@@ -34,15 +32,11 @@ public class repartidor implements rastreable, facturable {
             throw new IllegalArgumentException("El pedido no está asignado a este repartidor.");
         }
         pedido.cambiarEstado("ENTREGADO");
+        historialEntregas.add(pedido);
     }
 
     private boolean contienePedido(pedido buscado) {
-        for (int i = 0; i < cantidadPedidos; i++) {
-            if (pedidosAsignados[i] == buscado) {
-                return true;
-            }
-        }
-        return false;
+        return pedidosAsignados.contains(buscado);
     }
 
     public int getLegajo() {
@@ -71,27 +65,25 @@ public class repartidor implements rastreable, facturable {
         this.vehiculo = vehiculo;
     }
 
-    public pedido[] getPedidosAsignados() {
-        pedido[] resultado = new pedido[cantidadPedidos];
-        System.arraycopy(pedidosAsignados, 0, resultado, 0, cantidadPedidos);
-        return resultado;
+    public List<pedido> getPedidosAsignados() {
+        return new ArrayList<>(pedidosAsignados);
     }
 
-    public repartidor(int legajo, String nombre, vehiculo vehiculo, pedido[] pedidosAsignados) {
+    public List<pedido> getHistorialEntregas() {
+        return new ArrayList<>(historialEntregas);
+    }
+
+    public repartidor(int legajo, String nombre, vehiculo vehiculo, List<pedido> pedidosAsignados) {
         if (legajo <= 0 || nombre == null || nombre.isBlank() || vehiculo == null) {
             throw new IllegalArgumentException("Legajo, nombre y vehículo deben ser válidos.");
         }
         this.legajo = legajo;
         this.nombre = nombre;
         this.vehiculo = vehiculo;
-        this.pedidosAsignados = new pedido[pedidosAsignados == null ? 100 : pedidosAsignados.length];
         if (pedidosAsignados != null) {
             for (pedido asignado : pedidosAsignados) {
                 if (asignado != null) {
-                    if (cantidadPedidos == this.pedidosAsignados.length) {
-                        throw new IllegalArgumentException("El arreglo de pedidos asignados no es válido.");
-                    }
-                    this.pedidosAsignados[cantidadPedidos++] = asignado;
+                    this.pedidosAsignados.add(asignado);
                 }
             }
         }
@@ -101,9 +93,9 @@ public class repartidor implements rastreable, facturable {
     @Override
     public double calcularImporte() {
         double importe = 0;
-        for (int i = 0; i < cantidadPedidos; i++) {
-            if ("ENTREGADO".equals(pedidosAsignados[i].getEstado())) {
-                importe += pedidosAsignados[i].calcularImporte();
+        for (pedido pedidoActual : pedidosAsignados) {
+            if ("ENTREGADO".equals(pedidoActual.getEstado())) {
+                importe += pedidoActual.calcularImporte();
             }
         }
         return importe * 0.10;
@@ -111,10 +103,10 @@ public class repartidor implements rastreable, facturable {
 
     @Override
     public String obtenerEstadoActual() {
-        return "Repartidor " + nombre + " - pedidos asignados: " + cantidadPedidos;
+        return "Repartidor " + nombre + " - pedidos asignados: " + pedidosAsignados.size();
     }
 
     public int getCantidadPedidos() {
-        return cantidadPedidos;
+        return pedidosAsignados.size();
     }
 }

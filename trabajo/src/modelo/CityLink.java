@@ -1,62 +1,63 @@
 package modelo;
 
-import java.util.ArrayList;
-
-import excepciones.AlmacenamientoLlenoException;
+import algoritmos.Algoritmos;
+import excepciones.CapacidadExcedidaException;
 import excepciones.ClienteNoEncontradoException;
 import excepciones.PedidoInvalidoException;
-import excepciones.CapacidadExcedidaException;
+import java.time.LocalDateTime;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Deque;
+import java.util.List;
+import java.util.TreeMap;
 
 public class CityLink {
-    private static final int CAPACIDAD_CLIENTES = 50;
-    private static final int CAPACIDAD_PEDIDOS = 100;
-    private static final int CAPACIDAD_REPARTIDORES = 10;
-
-    private final ArrayList<cliente> clientes = new ArrayList<>();
+    private final TreeMap<Integer, cliente> clientes = new TreeMap<>();
     private final ArrayList<pedido> pedidos = new ArrayList<>();
     private final ArrayList<repartidor> repartidores = new ArrayList<>();
-    private int cantidadClientes;
-    private int cantidadPedidos;
-    private int cantidadRepartidores;
+    private final Deque<pedido> colaUrgentes = new ArrayDeque<>();
+    private final Deque<pedido> colaNormales = new ArrayDeque<>();
+    private final Deque<String> pilaOperaciones = new ArrayDeque<>();
 
-    public void cargarDatosPrueba() throws AlmacenamientoLlenoException, ClienteNoEncontradoException,
+    public void cargarDatosPrueba() throws ClienteNoEncontradoException,
             PedidoInvalidoException, CapacidadExcedidaException {
-        cliente[] clientesPrueba = {
+        List<cliente> clientesPrueba = List.of(
             new cliente("Centro", 1111111, "Ana", 1),
             new cliente("Norte", 2222222, "Bruno", 2),
             new cliente("Sur", 3333333, "Carla", 3),
             new cliente("Este", 4444444, "Diego", 4),
             new cliente("Oeste", 5555555, "Elena", 5)
-        };
+        );
         for (cliente clientePrueba : clientesPrueba) {
             registrarCliente(clientePrueba);
         }
 
-        repartidor[] repartidoresPrueba = {
+        List<repartidor> repartidoresPrueba = List.of(
             new repartidor(101, "Rocio", new bicicleta(101, 10, 15, 50), null),
             new repartidor(102, "Martin", new motocicleta(102, 30, 40, 120), null),
             new repartidor(103, "Sofia", new camioneta(103, 500, 30, 300), null)
-        };
+        );
         for (repartidor repartidorPrueba : repartidoresPrueba) {
             registrarRepartidor(repartidorPrueba);
         }
 
-        registrarPedido(new pedidoNormal(1, clientesPrueba[0], "Plaza Central", 2, 4,
-                java.time.LocalDateTime.now()));
-        registrarPedido(new pedidoUrgente(2, clientesPrueba[1], "Hospital Norte", 5, 8,
-                java.time.LocalDateTime.now()));
-        registrarPedido(new pedidoFragil(3, clientesPrueba[2], "Farmacia Sur", 3, 6,
-                java.time.LocalDateTime.now()));
-        registrarPedido(new pedidoNormal(4, clientesPrueba[3], "Escuela Este", 4, 10,
-                java.time.LocalDateTime.now()));
-        registrarPedido(new pedidoUrgente(5, clientesPrueba[4], "Terminal Oeste", 12, 14,
-                java.time.LocalDateTime.now()));
-        registrarPedido(new pedidoFragil(6, clientesPrueba[0], "Clinica Centro", 8, 3,
-                java.time.LocalDateTime.now()));
-        registrarPedido(new pedidoNormal(7, clientesPrueba[1], "Parque Norte", 7, 5,
-                java.time.LocalDateTime.now()));
-        registrarPedido(new pedidoUrgente(8, clientesPrueba[2], "Estacion Sur", 20, 12,
-                java.time.LocalDateTime.now()));
+        registrarPedido(new pedidoNormal(1, clientesPrueba.get(0), "Plaza Central", 2, 4,
+                LocalDateTime.now()));
+        registrarPedido(new pedidoUrgente(2, clientesPrueba.get(1), "Hospital Norte", 5, 8,
+                LocalDateTime.now()));
+        registrarPedido(new pedidoFragil(3, clientesPrueba.get(2), "Farmacia Sur", 3, 6,
+                LocalDateTime.now()));
+        registrarPedido(new pedidoNormal(4, clientesPrueba.get(3), "Escuela Este", 4, 10,
+                LocalDateTime.now()));
+        registrarPedido(new pedidoUrgente(5, clientesPrueba.get(4), "Terminal Oeste", 12, 14,
+                LocalDateTime.now()));
+        registrarPedido(new pedidoFragil(6, clientesPrueba.get(0), "Clinica Centro", 8, 3,
+                LocalDateTime.now()));
+        registrarPedido(new pedidoNormal(7, clientesPrueba.get(1), "Parque Norte", 7, 5,
+                LocalDateTime.now()));
+        registrarPedido(new pedidoUrgente(8, clientesPrueba.get(2), "Estacion Sur", 20, 12,
+                LocalDateTime.now()));
 
         asignarPedido(1, 101);
         asignarPedido(2, 102);
@@ -67,36 +68,34 @@ public class CityLink {
         asignarPedido(7, 101);
         asignarPedido(8, 103);
 
-        buscarPedido(1).cambiarEstado("EN_CAMINO");
-        buscarPedido(1).cambiarEstado("ENTREGADO");
-        buscarPedido(3).cambiarEstado("EN_CAMINO");
-        buscarPedido(3).cambiarEstado("ENTREGADO");
+        cambiarEstadoPedido(1, "EN_CAMINO");
+        cambiarEstadoPedido(1, "ENTREGADO");
+        cambiarEstadoPedido(3, "EN_CAMINO");
+        cambiarEstadoPedido(3, "ENTREGADO");
     }
 
-    public void registrarCliente(cliente nuevo) throws AlmacenamientoLlenoException {
-        if (cantidadClientes == clientes.size()) {
-            throw new AlmacenamientoLlenoException("No hay espacio para más clientes.");
-        }
+    public void registrarCliente(cliente nuevo) {
         if (nuevo == null) {
             throw new IllegalArgumentException("El cliente es obligatorio.");
         }
         if (nuevo.getId() <= 0) {
             throw new IllegalArgumentException("El código del cliente debe ser positivo.");
         }
-        for (cliente c : clientes) {
-            if (c.getId() == nuevo.getId()) {
-                throw new IllegalArgumentException("Ya existe un cliente con ese código.");
-            }
+        if (clientes.containsKey(nuevo.getId())) {
+            throw new IllegalArgumentException("Ya existe un cliente con ese código.");
         }
-        clientes.add(nuevo);
-        cantidadClientes++;
+        clientes.put(nuevo.getId(), nuevo);
+    }
+
+    public void eliminarCliente(int codigo) throws ClienteNoEncontradoException {
+        if (clientes.remove(codigo) == null) {
+            throw new ClienteNoEncontradoException(
+                    "No existe un cliente con el código " + codigo + ".");
+        }
     }
 
     public void registrarPedido(pedido nuevo)
-            throws AlmacenamientoLlenoException, ClienteNoEncontradoException, PedidoInvalidoException {
-        if (cantidadPedidos == pedidos.size()) {
-            throw new AlmacenamientoLlenoException("No hay espacio para más pedidos.");
-        }
+            throws ClienteNoEncontradoException, PedidoInvalidoException {
         if (nuevo == null) {
             throw new PedidoInvalidoException("El pedido es obligatorio.");
         }
@@ -104,64 +103,70 @@ public class CityLink {
             throw new PedidoInvalidoException("El pedido debe tener un cliente.");
         }
         nuevo.setCliente(buscarCliente(nuevo.getCliente().getId()));
-        for (pedido p : pedidos) {
-            if (p.getId() == nuevo.getId()) {
-                throw new PedidoInvalidoException("Ya existe un pedido con ese código.");
-            }
+        if (Algoritmos.buscarPedidoLineal(pedidos, nuevo.getId()) != null) {
+            throw new PedidoInvalidoException("Ya existe un pedido con ese código.");
         }
         pedidos.add(nuevo);
-        cantidadPedidos++;
+        if (nuevo instanceof pedidoUrgente) {
+            colaUrgentes.addLast(nuevo);
+        } else {
+            colaNormales.addLast(nuevo);
+        }
+        pilaOperaciones.push("ALTA_PEDIDO:" + nuevo.getId());
     }
 
-    public void registrarRepartidor(repartidor nuevo) throws AlmacenamientoLlenoException {
-        if (cantidadRepartidores == repartidores.size()) {
-            throw new AlmacenamientoLlenoException("No hay espacio para más repartidores.");
-        }
+    public void registrarRepartidor(repartidor nuevo) {
         if (nuevo == null) {
             throw new IllegalArgumentException("El repartidor es obligatorio.");
         }
         repartidores.add(nuevo);
-        cantidadRepartidores++;
     }
 
     public cliente buscarCliente(int codigo) throws ClienteNoEncontradoException {
-        for (cliente c : clientes) {
-            if (c.getId() == codigo) {
-                return c;
-            }
+        cliente encontrado = clientes.get(codigo);
+        if (encontrado == null) {
+            throw new ClienteNoEncontradoException(
+                    "No existe un cliente con el código " + codigo + ".");
         }
-        throw new ClienteNoEncontradoException("No existe un cliente con el código " + codigo + ".");
+        return encontrado;
     }
 
     public cliente buscarCliente(String nombre) throws ClienteNoEncontradoException {
-        if (nombre != null) {
-            for (cliente c : clientes) {
-                if (c.getNombre().equalsIgnoreCase(nombre.trim())) {
-                    return c;
-                }
-            }
+        cliente encontrado = Algoritmos.buscarClientePorNombreLineal(
+                new ArrayList<>(clientes.values()), nombre);
+        if (encontrado == null) {
+            throw new ClienteNoEncontradoException("No existe un cliente con ese nombre.");
         }
-        throw new ClienteNoEncontradoException("No existe un cliente con ese nombre.");
+        return encontrado;
     }
 
     public void asignarPedido(int codigoPedido, int legajo)
-            throws CapacidadExcedidaException, AlmacenamientoLlenoException {
-        buscarRepartidor(legajo).asignarPedido(buscarPedido(codigoPedido));
+            throws CapacidadExcedidaException {
+        pedido pedidoAsignado = buscarPedido(codigoPedido);
+        buscarRepartidor(legajo).asignarPedido(pedidoAsignado);
+        colaUrgentes.remove(pedidoAsignado);
+        colaNormales.remove(pedidoAsignado);
+        pilaOperaciones.push("ASIGNAR_PEDIDO:" + codigoPedido);
     }
 
     public pedido buscarPedido(int codigo) {
-        for (pedido p : pedidos) {
-            if (p.getId() == codigo) {
-                return p;
-            }
+        pedido encontrado = Algoritmos.buscarPedidoLineal(pedidos, codigo);
+        if (encontrado == null) {
+            throw new IllegalArgumentException("No existe un pedido con el código " + codigo + ".");
         }
-        throw new IllegalArgumentException("No existe un pedido con el código " + codigo + ".");
+        return encontrado;
+    }
+
+    public pedido buscarPedidoBinaria(int codigo) {
+        List<pedido> pedidosOrdenados = Algoritmos.ordenarInsercion(
+                pedidos, Comparator.comparingInt(pedido::getId));
+        return Algoritmos.buscarPedidoBinaria(pedidosOrdenados, codigo);
     }
 
     public repartidor buscarRepartidor(int legajo) {
-        for (repartidor r : repartidores) {
-            if (r.getLegajo() == legajo) {
-                return r;
+        for (repartidor repartidorActual : repartidores) {
+            if (repartidorActual.getLegajo() == legajo) {
+                return repartidorActual;
             }
         }
         throw new IllegalArgumentException("No existe un repartidor con ese legajo.");
@@ -176,26 +181,43 @@ public class CityLink {
             encontrado.getRepartidorAsignado().registrarEntrega(encontrado);
         } else {
             encontrado.cambiarEstado(nuevoEstado);
+            if ("CANCELADO".equals(nuevoEstado)) {
+                colaUrgentes.remove(encontrado);
+                colaNormales.remove(encontrado);
+            }
         }
+        pilaOperaciones.push("CAMBIAR_ESTADO:" + codigoPedido + ":" + nuevoEstado);
     }
 
-    public pedido[] getPedidos() {
-        pedido[] resultado = new pedido[cantidadPedidos];
-        System.arraycopy(pedidos, 0, resultado, 0, cantidadPedidos);
-        return resultado;
+    public List<cliente> getClientes() {
+        return new ArrayList<>(clientes.values());
     }
 
-    public repartidor[] getRepartidores() {
-        repartidor[] resultado = new repartidor[cantidadRepartidores];
-        System.arraycopy(repartidores, 0, resultado, 0, cantidadRepartidores);
-        return resultado;
+    public List<pedido> getPedidos() {
+        return new ArrayList<>(pedidos);
+    }
+
+    public List<repartidor> getRepartidores() {
+        return new ArrayList<>(repartidores);
+    }
+
+    public Deque<pedido> getColaUrgentes() {
+        return new ArrayDeque<>(colaUrgentes);
+    }
+
+    public Deque<pedido> getColaNormales() {
+        return new ArrayDeque<>(colaNormales);
+    }
+
+    public Deque<String> getPilaOperaciones() {
+        return new ArrayDeque<>(pilaOperaciones);
     }
 
     public double calcularImporteTotal() {
         double total = 0;
-        for (pedido p : pedidos) {
-            if (p.getRepartidorAsignado() != null) {
-                total += p.calcularImporte();
+        for (pedido pedidoActual : pedidos) {
+            if (pedidoActual.getRepartidorAsignado() != null) {
+                total += pedidoActual.calcularImporte();
             }
         }
         return total;
