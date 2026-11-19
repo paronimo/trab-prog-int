@@ -274,11 +274,18 @@ public class Main {
 
     private static Comparator<pedido> leerCriterio(Scanner scanner) {
         return switch (leerEntero(scanner, "Opción: ")) {
-            case 1 -> Comparator.comparingDouble(pedido::calcularImporte);
+            case 1 -> Comparator.comparingDouble(Main::obtenerCostoParaOrdenar);
             case 2 -> Comparator.comparingDouble(pedido::getDistanciaKm);
             case 3 -> Comparator.comparing(pedido::getFechaHora);
             default -> throw new IllegalArgumentException("Criterio de orden inválido.");
         };
+    }
+
+    private static double obtenerCostoParaOrdenar(pedido pedidoActual) {
+        if (pedidoActual.getRepartidorAsignado() == null) {
+            return 0;
+        }
+        return pedidoActual.calcularImporte();
     }
 
     private static void mostrarPedidos(List<pedido> pedidos) {
