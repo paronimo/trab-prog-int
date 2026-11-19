@@ -124,6 +124,18 @@ public abstract class pedido implements rastreable, facturable {
         this.vehiculoAsignado = nuevo.getVehiculo();
     }
 
+    void desasignarRepartidor(repartidor esperado) {
+        if (repartidorAsignado != esperado) {
+            throw new IllegalArgumentException("El pedido no está asignado a este repartidor.");
+        }
+        repartidorAsignado = null;
+        vehiculoAsignado = null;
+    }
+
+    void restaurarEstado(String estado) {
+        this.estado = estado;
+    }
+
     // REGLA: PENDIENTE -> EN_CAMINO -> ENTREGADO, y CANCELADO solo desde PENDIENTE
     public void cambiarEstado(String nuevoEstado) {
         boolean valido =

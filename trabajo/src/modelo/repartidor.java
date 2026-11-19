@@ -35,6 +35,19 @@ public class repartidor implements rastreable, facturable {
         historialEntregas.add(pedido);
     }
 
+    void desasignarPedido(pedido pedido) {
+        if (!pedidosAsignados.remove(pedido)) {
+            throw new IllegalArgumentException("El pedido no está asignado a este repartidor.");
+        }
+        pedido.desasignarRepartidor(this);
+    }
+
+    void quitarEntrega(pedido pedido) {
+        if (!historialEntregas.remove(pedido)) {
+            throw new IllegalArgumentException("El pedido no está en el historial de entregas.");
+        }
+    }
+
     private boolean contienePedido(pedido buscado) {
         return pedidosAsignados.contains(buscado);
     }

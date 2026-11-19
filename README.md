@@ -2,7 +2,7 @@
 
 ## Alcance
 
-Este avance conserva las clases, el polimorfismo y las excepciones del Entregable 1. Sustituye el almacenamiento de capacidad fija por colecciones de `java.util` e incorpora algoritmos manuales. El menu sigue siendo el del Entregable 1: por ahora no se agregaron las nuevas opciones del menu del Entregable 2.
+Este avance conserva las clases, el polimorfismo y las excepciones del Entregable 1. Sustituye el almacenamiento de capacidad fija por colecciones de `java.util` e incorpora algoritmos manuales. El menu incluye ahora las operaciones del Entregable 2.
 
 ## Estructuras y algoritmos
 
@@ -11,6 +11,8 @@ Este avance conserva las clases, el polimorfismo y las excepciones del Entregabl
 - `algoritmos.Algoritmos` contiene busqueda lineal, busqueda binaria, ordenamiento burbuja, ordenamiento por insercion e intercalacion. Los ordenamientos e intercalacion reciben un `Comparator` y no usan `Collections.sort`, `List.sort` ni `binarySearch`.
 - La busqueda binaria de `CityLink` prepara una copia ordenada por codigo antes de buscar. La busqueda binaria de `Algoritmos` recibe una lista que ya debe estar ordenada por codigo.
 - Las busquedas de algoritmo devuelven `null` si no encuentran el elemento. Las busquedas de clientes de `CityLink` informan la ausencia con `ClienteNoEncontradoException`.
+- El menu permite gestionar clientes y repartidores, registrar y atender pedidos (urgentes antes que normales), registrar entregas, deshacer operaciones, ordenar/buscar pedidos e intercalar dos turnos.
+- Para intercalar turnos, se ingresan los codigos de pedido de cada lista; cada lista se ordena con insercion y despues se combina en un solo recorrido. En el menu, la operacion de deshacer restaura la operacion mas reciente realizada durante la sesion (los datos de prueba iniciales quedan como base).
 
 Ejemplos de criterios para ordenar pedidos:
 
@@ -37,7 +39,7 @@ classDiagram
         -ArrayList~repartidor~ repartidores
         -Deque~pedido~ colaUrgentes
         -Deque~pedido~ colaNormales
-        -Deque~String~ pilaOperaciones
+        -Deque~Operacion~ pilaOperaciones
     }
     class cliente
     class pedido {
@@ -106,9 +108,15 @@ Se pueden probar estos casos usando `Algoritmos` y `CityLink`:
 | Ordenamiento | Aplicar burbuja e insercion con el mismo `Comparator` | Ambos resultados quedan ordenados y las listas originales no cambian |
 | Clientes | Registrar codigos fuera de orden y recorrer `getClientes()` | Los clientes se listan por codigo ascendente |
 | Colas | Registrar pedidos urgentes y normales | Cada cola conserva el orden de llegada de sus pedidos |
+| Atencion | Tener al menos un pedido urgente y uno normal | Se atiende primero el urgente; dentro de la cola se conserva FIFO |
+| Cola vacia | Atender sin pedidos pendientes | Informa que no hay pedidos, sin interrumpir el programa |
+| Capacidad | Atender un pedido sin repartidor compatible | Informa el problema y conserva el pedido en su cola |
+| Entrega y deshacer | Registrar entrega y deshacer | El estado vuelve a `EN_CAMINO` y se elimina del historial |
+| Deshacer atencion | Atender un pedido y deshacer | Revierte asignacion/estado y restaura el pedido al frente de su cola |
+| Menu | Elegir salir | El programa finaliza normalmente |
 
 La busqueda binaria exige entrada ordenada por codigo. En caso de querer probar una lista vacia o de un solo elemento, se puede pasar `List.of()` o `List.of(pedido)` a los metodos de `Algoritmos`.
 
 ## Declaracion de uso de IA
 
-Se uso Copilot en VS Code como asistente para orientar la migracion a colecciones dinamicas, la implementacion de los algoritmos y la actualizacion de esta documentacion. El resultado se verifico compilando todos los archivos Java con `javac` y comprobando los casos de busqueda, ordenamiento e intercalacion indicados arriba. No se usaron funciones de ordenamiento ni busqueda binaria de `java.util`.
+Se uso Copilot en VS Code como asistente para orientar la migracion a colecciones dinamicas, la implementacion de los algoritmos y las funcionalidades del menu. El resultado se verifico compilando todos los archivos Java con `javac` y probando manualmente casos normales y bordes, incluyendo colas vacias, atencion por prioridad, deshacer, busqueda, ordenamiento e intercalacion. No se usaron funciones de ordenamiento ni busqueda binaria de `java.util`.
